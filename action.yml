@@ -5,6 +5,7 @@ runs:
   using: "docker"
   image: "Dockerfile"
   args:
-    - "pwd"
+    - "ls"
+    - "-la"
       # - "changelog-checker"
       # - "/github/workspace"
