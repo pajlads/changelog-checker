@@ -1,0 +1,10 @@
+[package]
+name = "changelog-checker"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = { version = "1.0.75" }
+argh = "0.1.12"
+colored = "2.0.4"
+unidiff = { version = "0.3.3" }
