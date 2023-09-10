@@ -6,7 +6,7 @@ pub(crate) struct Args {
     /// path to the changelog file, relative to the git repository root
     pub(crate) changelog_path: String,
 
-    /// diff to compare head to. defaults to refs/heads/master
+    /// diff to compare head to. defaults to origin/master
     pub(crate) diff_ref: String,
 
     /// relative or absolute path to the repository
@@ -17,14 +17,25 @@ pub(crate) struct Args {
 }
 
 fn usage() -> String {
-    "Usage: changelog-checker [--changelog-path <changelog-path>] [--diff-ref <diff-ref>] [--strict] <repo-path>".to_owned()
+    "Usage: changelog-checker [OPTIONS] <repo-path>
+
+Options:
+  --changelog-path <changelog-path>     Path to the changelog path relative
+                                        to repo-path.
+                                        Default value is CHANGELOG.md
+  --diff-ref <diff-ref>                 Ref to diff against.
+                                        Default value is origin/master
+  --strict                              Enables strict checks for added changelog
+                                        entries, ensuring they are only added
+                                        to the Unreleased section."
+        .to_owned()
 }
 
 pub(crate) fn parse_args() -> anyhow::Result<Args> {
     use lexopt::prelude::*;
 
     let mut changelog_path: String = "CHANGELOG.md".to_owned();
-    let mut diff_ref: String = "refs/heads/master".to_owned();
+    let mut diff_ref: String = "origin/master".to_owned();
     let mut repo_path: Option<PathBuf> = None;
     let mut parser = lexopt::Parser::from_env();
     let mut strict = false;
