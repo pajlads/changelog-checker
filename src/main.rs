@@ -1,40 +1,14 @@
 use std::{
-    path::{Path, PathBuf},
+    path::Path,
     process::{ExitCode, Stdio},
 };
 
-use anyhow::Result;
-use argh::FromArgs;
 use colored::Colorize;
 use unidiff::PatchSet;
 
-fn default_changelog_path() -> String {
-    "CHANGELOG.md".to_owned()
-}
+mod args;
 
-fn default_diff_ref() -> String {
-    "refs/heads/master".to_owned()
-}
-
-#[derive(FromArgs, Debug, Clone)]
-/// Check added changelog entries
-struct Args {
-    /// path to the changelog file, relative to the git repository root
-    #[argh(option, default = "default_changelog_path()")]
-    changelog_path: String,
-
-    /// diff to compare head to. defaults to refs/heads/master
-    #[argh(option, default = "default_diff_ref()")]
-    diff_ref: String,
-
-    /// relative or absolute path to the repository
-    #[argh(option)]
-    repo_path: PathBuf,
-
-    /// whether to error out if any changelog addition was made to a non-unversioned section
-    #[argh(switch)]
-    strict: bool,
-}
+use args::{parse_args, Args};
 
 struct Checker {
     args: Args,
@@ -50,11 +24,11 @@ struct AddedEntries {
 }
 
 impl Checker {
-    pub fn new(args: Args) -> Result<Self> {
+    pub fn new(args: Args) -> anyhow::Result<Self> {
         Ok(Self { args })
     }
 
-    pub fn check(&self) -> Result<Vec<AddedEntries>> {
+    pub fn check(&self) -> anyhow::Result<Vec<AddedEntries>> {
         let mut added_entries: Vec<AddedEntries> = Vec::new();
 
         let xd = std::process::Command::new("git")
@@ -110,8 +84,8 @@ impl Checker {
     }
 }
 
-fn main() -> Result<ExitCode> {
-    let args: Args = argh::from_env();
+fn main() -> anyhow::Result<ExitCode> {
+    let args = parse_args()?;
 
     let checker = Checker::new(args.clone())?;
 
