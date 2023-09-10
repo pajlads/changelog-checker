@@ -1,0 +1,11 @@
+---
+name: Changelog Checker
+
+on:
+  pull_request:
+
+jobs:
+  changelog-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./

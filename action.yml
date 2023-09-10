@@ -1,0 +1,24 @@
+name: "Changelog checker"
+author: "@pajlada"
+description: "Make sure no changelog entries were added to already-released sections"
+inputs:
+  strict:
+    description: "Error out if a changelog entry was added to an already-released section"
+    required: false
+    default: true
+  changelogPath:
+    description: "Path to the changelog file. Default is CHANGELOG.md"
+    required: false
+    default: "CHANGELOG.md"
+  repo:
+    default: ${{ github.repository }}
+  pr:
+    default: ${{ github.event.pull_request.number }}
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  args:
+    - "--strict=${{ inputs.strict }}"
+    - "--changelog-path=${{ inputs.changelogPath }}"
+    - "${{ inputs.repo }}"
+    - "${{ inputs.pr }}"
