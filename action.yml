@@ -1,6 +1,6 @@
 # action.yml
-name: "Hello World"
-description: "Greet someone and record the time"
+name: "Changelog checker"
+description: "Make sure no changelog entries were added to already-released sections"
 runs:
   using: "docker"
   image: "Dockerfile"

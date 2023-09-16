@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Remove anyhow dependency. (#9)
 - Test
 - Foo
 - Bar
