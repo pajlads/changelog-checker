@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow = { version = "1.0.75" }
 colored = "2.0.4"
 lexopt = "0.3.0"
 unidiff = { version = "0.3.3" }

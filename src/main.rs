@@ -1,95 +1,33 @@
-use std::{
-    path::Path,
-    process::{ExitCode, Stdio},
-};
+use std::process::ExitCode;
 
 use colored::Colorize;
-use unidiff::PatchSet;
 
 mod args;
+use args::parse_args;
+pub use args::Args;
 
-use args::{parse_args, Args};
+mod checker;
+use checker::Checker;
 
-struct Checker {
-    args: Args,
-}
-
-#[derive(Debug)]
-struct AddedEntries {
-    /// Category the entry was added under, e.g. "Unversioned" or "2.4.5"
-    category: String,
-
-    /// The full text entry (e.g. - Added cool feature. (#4770))
-    text: String,
-}
-
-impl Checker {
-    pub fn new(args: Args) -> anyhow::Result<Self> {
-        Ok(Self { args })
-    }
-
-    pub fn check(&self) -> anyhow::Result<Vec<AddedEntries>> {
-        let mut added_entries: Vec<AddedEntries> = Vec::new();
-
-        let xd = std::process::Command::new("git")
-            .stderr(Stdio::piped())
-            .stdout(Stdio::piped())
-            .arg("-C")
-            .arg(&self.args.repo_path)
-            .arg("diff")
-            .arg(&self.args.diff_ref)
-            .arg(&self.args.changelog_path)
-            .spawn()?
-            .wait_with_output()?;
-
-        let mut patch = PatchSet::new();
-        patch.parse_bytes(&xd.stdout)?;
-
-        let modified_files = patch.modified_files();
-
-        if let Some(changelog_diff) = modified_files.first() {
-            let mut additions: Vec<(usize, String)> = Vec::new();
-
-            for hunk in changelog_diff.hunks() {
-                for line in hunk.lines() {
-                    if line.line_type != "+" {
-                        continue;
-                    }
-                    additions.push((line.target_line_no.unwrap(), line.value.clone()));
-                }
-            }
-
-            let contents = std::fs::read_to_string(Path::join(
-                &self.args.repo_path,
-                &self.args.changelog_path,
-            ))?;
-            let lines: Vec<&str> = contents.lines().collect();
-
-            for (line_no, contents) in additions {
-                let before = &lines[0..line_no];
-
-                for xd in before.iter().rev() {
-                    if xd.starts_with("## ") {
-                        added_entries.push(AddedEntries {
-                            category: xd.trim_start_matches("## ").to_owned(),
-                            text: contents,
-                        });
-                        break;
-                    }
-                }
-            }
+fn main() -> Result<(), ExitCode> {
+    let args = match parse_args() {
+        Ok(args) => args,
+        Err(e) => {
+            println!("{e}");
+            args::print_usage();
+            std::process::exit(1);
         }
+    };
 
-        Ok(added_entries)
-    }
-}
+    let checker = Checker::new(args.clone());
 
-fn main() -> anyhow::Result<ExitCode> {
-    let args = parse_args()?;
-
-    let checker = Checker::new(args.clone())?;
-
-    let added_entries = checker.check()?;
+    let added_entries = match checker.check() {
+        Ok(added_entries) => added_entries,
+        Err(e) => {
+            println!("Error checking changelog entries: {e}");
+            std::process::exit(1);
+        }
+    };
 
     let mut has_error = false;
 
@@ -115,8 +53,8 @@ fn main() -> anyhow::Result<ExitCode> {
             "{} At least one changelog entry was added in the wrong place",
             "ERROR:".red()
         );
-        Ok(1.into())
-    } else {
-        Ok(0.into())
+        std::process::exit(1);
     }
+
+    Ok(())
 }
