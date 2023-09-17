@@ -13,10 +13,10 @@ pub struct AddedEntry {
     pub line_number: usize,
 }
 
-pub type GitHubPrFiles = Vec<Change>;
+type GitHubPrFiles = Vec<Change>;
 
 #[derive(Deserialize, Debug)]
-pub struct Change {
+struct Change {
     filename: String,
     #[serde(default)]
     patch: String,
@@ -66,6 +66,23 @@ fn parse_hunks(patch: &str) -> Vec<Hunk> {
     hunks
 }
 
+/// Returns a list of added changelog entries in the given repo & PR
+///
+/// # Arguments
+///
+/// * `repo_name` - the full repo name, including its owner (e.g. `Chatterino/chatterino2`)
+/// * `pr_number` - the PR number, as a string (e.g. `4919`)
+/// * `changelog_path` - the path & filename of the changelog file, relative to the repo root (e.g.
+/// CHANGELOG.md)
+///
+/// # Examples
+///
+/// ```
+/// let entries = checker::check("Chatterino/chatterino2", "4631", "CHANGELOG.md");
+/// if let Some(entries) = entries {
+///     println!("Changelog entries: {entries:?}");
+/// }
+/// ```
 pub fn check(repo_name: &str, pr_number: &str, changelog_path: &str) -> Result<Vec<AddedEntry>> {
     let client = reqwest::blocking::Client::builder()
         .user_agent("changelog checker https://github.com/pajlads/changelog-checker")
