@@ -2,13 +2,8 @@
 
 ## Unreleased
 
-- Remove anyhow dependency. (#9)
-- Test
-- Foo
-- Bar
-- Base
+- fix: `raw_url` is optional, check for the existance of it only for the changelog change. (#12)
 
-## 0.0.1
+## 1.0.0
 
-- Test
-- hehe
+- Initial release
