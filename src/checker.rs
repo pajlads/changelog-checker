@@ -20,7 +20,7 @@ struct Change {
     filename: String,
     #[serde(default)]
     patch: String,
-    raw_url: String,
+    raw_url: Option<String>,
 }
 
 #[derive(Debug)]
@@ -99,8 +99,11 @@ pub fn check(repo_name: &str, pr_number: &str, changelog_path: &str) -> Result<V
     if let Some(changelog_diff_entry) = changelog_diff_entry {
         let hunks = parse_hunks(&changelog_diff_entry.patch);
         let pr_additions = hunks.into_iter().flat_map(|h| h.added_lines);
+        let raw_url = changelog_diff_entry
+            .raw_url
+            .ok_or_else(|| anyhow::anyhow!("Changelog entry did not include a `raw_url` field"))?;
 
-        let changelog_contents = client.get(changelog_diff_entry.raw_url).send()?.text()?;
+        let changelog_contents = client.get(raw_url).send()?.text()?;
         let changelog_lines: Vec<&str> = changelog_contents.lines().collect();
 
         for (line_no, contents) in pr_additions {
