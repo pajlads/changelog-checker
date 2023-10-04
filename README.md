@@ -18,7 +18,7 @@ jobs:
   changelog-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: pajlads/changelog-checker@v1.0.0
+      - uses: pajlads/changelog-checker@v1.0.1
 ```
 
 ### Skippable checker
@@ -57,7 +57,7 @@ jobs:
             }
             return "";
 
-      - uses: pajlads/changelog-checker@v1.0.0
+      - uses: pajlads/changelog-checker@v1.0.1
         if: steps.label-checker.outputs.result != 'skip'
 ```
 
