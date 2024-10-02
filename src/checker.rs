@@ -92,7 +92,7 @@ pub fn check(repo_name: &str, pr_number: &str, changelog_path: &str) -> Result<V
         format!("https://api.github.com/repos/{repo_name}/pulls/{pr_number}/files").as_str(),
     )?;
 
-    let resp: GitHubPrFiles = client.get(url).send()?.json()?;
+    let resp: GitHubPrFiles = client.get(url).send()?.error_for_status()?.json()?;
     let mut added_entries: Vec<AddedEntry> = Vec::new();
 
     let changelog_diff_entry = resp.into_iter().find(|c| c.filename == changelog_path);
