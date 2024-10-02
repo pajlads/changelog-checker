@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.2
+
 - fix: Improved reporting for bad HTTP status codes. (#90)
 
 ## 1.0.1
