@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix: Improved reporting for bad HTTP status codes. (#90)
+
 ## 1.0.1
 
 - fix: `raw_url` is optional, check for the existance of it only for the changelog change. (#12)
