@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix: Re-enabled https :-). (#164)
+
 ## 1.0.3
 
 - chore: Added error contexts to HTTP requests. (#162)
