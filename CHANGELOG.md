@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.3
+
 - chore: Added error contexts to HTTP requests. (#162)
 
 ## 1.0.2
