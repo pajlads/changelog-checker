@@ -1,4 +1,5 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
+use reqwest::blocking::Response;
 use serde::Deserialize;
 
 #[derive(Debug)]
@@ -92,7 +93,12 @@ pub fn check(repo_name: &str, pr_number: &str, changelog_path: &str) -> Result<V
         format!("https://api.github.com/repos/{repo_name}/pulls/{pr_number}/files").as_str(),
     )?;
 
-    let resp: GitHubPrFiles = client.get(url).send()?.error_for_status()?.json()?;
+    let resp: GitHubPrFiles = client
+        .get(url.clone())
+        .send()
+        .and_then(Response::error_for_status)
+        .and_then(Response::json)
+        .with_context(|| format!("Getting files for {repo_name}#{pr_number} (url: {url})"))?;
     let mut added_entries: Vec<AddedEntry> = Vec::new();
 
     let changelog_diff_entry = resp.into_iter().find(|c| c.filename == changelog_path);
@@ -103,7 +109,12 @@ pub fn check(repo_name: &str, pr_number: &str, changelog_path: &str) -> Result<V
             .raw_url
             .ok_or_else(|| anyhow::anyhow!("Changelog entry did not include a `raw_url` field"))?;
 
-        let changelog_contents = client.get(raw_url).send()?.text()?;
+        let changelog_contents = client
+            .get(raw_url.clone())
+            .send()
+            .and_then(Response::error_for_status)
+            .and_then(Response::text)
+            .with_context(|| format!("Getting changelog file (url: {raw_url})"))?;
         let changelog_lines: Vec<&str> = changelog_contents.lines().collect();
 
         for (line_no, contents) in pr_additions {

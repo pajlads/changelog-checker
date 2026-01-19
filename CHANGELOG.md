@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- chore: Added error contexts to HTTP requests. (#162)
+
 ## 1.0.2
 
 - fix: Improved reporting for bad HTTP status codes. (#90)
