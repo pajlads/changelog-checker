@@ -21,7 +21,7 @@ fn main() -> Result<(), ExitCode> {
     let added_entries = match checker::check(&args.repo, &args.pr_number, &args.changelog_path) {
         Ok(added_entries) => added_entries,
         Err(e) => {
-            println!("Error checking changelog entries: {e}");
+            println!("Error checking changelog entries: {e:?}");
             std::process::exit(1);
         }
     };
