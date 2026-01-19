@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- fix: Re-enabled https :-). (#164)
+## 1.0.4
+
+- fix: Re-enabled https :-). (#166)
 
 ## 1.0.3
 
